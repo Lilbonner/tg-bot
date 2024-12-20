@@ -1,39 +1,58 @@
+import subprocess
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters, ContextTypes
 
-purchase_orders = {}
+categories_to_suppliers = {
+    "базар": "Жолдощ базар",
+    "алкоголь": "Парадайс",
+    "вода": "Шоро",
+    "сендвичи": "Венера эже",
+    "пепси": "Пепси",
+    "пиво": "Тенгри"
+}
 
+category_data = {}
+
+# Стартовая команда
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text("Привет! Я бот для обработки закупок. Отправьте мне список товаров.")
+    await update.message.reply_text(
+        "Привет! Отправьте список товаров по категориям, например:\n\n"
+        "пиво:\n"
+        "stout-1\n"
+        "lager-1"
+    )
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     message = update.message.text
     try:
-        orders = message.split("\n")
-        for order in orders:
-            parts = order.split(" - ")
-            if len(parts) == 3:
-                item, quantity, supplier = parts[0], parts[1], parts[2]
-                if supplier not in purchase_orders:
-                    purchase_orders[supplier] = []
-                purchase_orders[supplier].append({"item": item, "quantity": quantity})
-        await update.message.reply_text("Закупка успешно обработана!")
-        print(purchase_orders)
-    except Exception as e:
-        await update.message.reply_text(f"Ошибка обработки: {e}")
+        lines = message.split("\n")
+        current_category = None
 
-async def show_orders(update: Update, context: ContextTypes.DEFAULT_TYPE):
+        for line in lines:
+            line = line.strip()
+            if line.endswith(":"):
+                current_category = line[:-1].lower()
+                if current_category not in category_data:
+                    category_data[current_category] = []
+            elif current_category:
+                category_data[current_category].append(line)
+
+        await update.message.reply_text("Данные успешно обработаны!")
+    except Exception as e:
+        await update.message.reply_text(f"Ошибка: {e}")
+
+async def show_data(update: Update, context: ContextTypes.DEFAULT_TYPE):
     response = ""
-    for supplier, orders in purchase_orders.items():
-        response += f"Поставщик {supplier}:\n"
-        for order in orders:
-            response += f"- {order['item']} ({order['quantity']})\n"
+    for category, items in category_data.items():
+        supplier = categories_to_suppliers.get(category, "Неизвестный поставщик")
+        response += f"Категория: {category} (Поставщик: {supplier}):\n"
+        response += "\n".join(f"- {item}" for item in items) + "\n\n"
     await update.message.reply_text(response if response else "Нет данных.")
 
 app = ApplicationBuilder().token("8016346915:AAHbffp3yGDk_K0ZwjUCTK1VRYRE7o1-UQI").build()
 
 app.add_handler(CommandHandler("start", start))
-app.add_handler(CommandHandler("show", show_orders))
+app.add_handler(CommandHandler("show", show_data))
 app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
 
 print("Бот запущен...")
