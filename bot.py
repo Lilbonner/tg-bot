@@ -13,11 +13,11 @@ categories_to_suppliers = {
 
 category_data = {}
 
-# Стартовая команда
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
         "Привет! Отправьте список товаров по категориям, например:\n\n"
         "пиво:\n"
+        "mango-1\n"
         "stout-1\n"
         "lager-1"
     )
@@ -49,10 +49,14 @@ async def show_data(update: Update, context: ContextTypes.DEFAULT_TYPE):
         response += "\n".join(f"- {item}" for item in items) + "\n\n"
     await update.message.reply_text(response if response else "Нет данных.")
 
+async def clear_data(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    category_data.clear()
+    await update.message.reply_text("Все данные очищены!")
 app = ApplicationBuilder().token("8016346915:AAHbffp3yGDk_K0ZwjUCTK1VRYRE7o1-UQI").build()
 
 app.add_handler(CommandHandler("start", start))
 app.add_handler(CommandHandler("show", show_data))
+app.add_handler(CommandHandler("clear", clear_data))
 app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
 
 print("Бот запущен...")
