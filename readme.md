@@ -77,7 +77,7 @@ The bot supports the following categories and their corresponding suppliers:
 This project is licensed under the MIT License.
 
 ## Acknowledgments
-This bot uses the `python-telegram-bot` library for Telegram API integration.
+This bot uses the ` python-telegram-bot ` library for Telegram API integration.
 
 ---
 For any issues or feature requests, feel free to open an issue on the repository or contact the developer.
