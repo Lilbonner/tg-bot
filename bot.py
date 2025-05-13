@@ -47,7 +47,7 @@ async def show_data(update: Update, context: ContextTypes.DEFAULT_TYPE):
         supplier = categories_to_suppliers.get(category, "Неизвестный поставщик")
         response += f"Категория: {category} (Поставщик: {supplier}):\n"
         response += "\n".join(f"- {item}" for item in items) + "\n\n"
-    await update.message.reply_text(response if response else "Нет данных.")
+    await update.message.reply_text(response if response else "Нет данных")
 
 async def clear_data(update: Update, context: ContextTypes.DEFAULT_TYPE):
     category_data.clear()
